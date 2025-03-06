@@ -8,3 +8,6 @@ venv/
 
 # Ignorar a pasta AppData ou outras pastas indesejadas
 AppData/
+"Ambiente de ImpressÆo/" 
+"Ambiente de Rede/" 
+"AppData/" 
