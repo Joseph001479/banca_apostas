@@ -6,8 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 CORS(app)  # Habilitar comunicação com o frontend
 
-# Conectar ao banco de dados MySQL (corrigido)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:J%40se001479@localhost/usuario_db'
+# Conectar ao banco de dados MySQL utilizando a URL fornecida
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://p1qexitu5ewqis3n:pqsv3y2uzvdbx68u@nwhazdrp7hdpd4a4.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/go0mmxvr550d0bbl'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -18,7 +18,7 @@ class Usuario(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)  # A senha será armazenada como hash
 
-# Criar tabelas no banco
+# Criar tabelas no banco (quando necessário)
 with app.app_context():
     db.create_all()
 
