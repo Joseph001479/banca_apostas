@@ -7,8 +7,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 CORS(app)  # Habilitar comunicação com o frontend
 
-# Pegar a URL de conexão do banco de dados a partir da variável de ambiente
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('JAWSDB_URL', 'mysql+pymysql://p1qexitu5ewqis3n:pqsv3y2uzvdbx68u@nwhazdrp7hdpd4a4.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/go0mmxvr550d0bbl')
+# Pegar a URL de conexão do banco de dados e ajustá-la para o SQLAlchemy
+DATABASE_URL = os.getenv('JAWSDB_URL')
+
+if DATABASE_URL and DATABASE_URL.startswith("mysql://"):
+    DATABASE_URL = DATABASE_URL.replace("mysql://", "mysql+pymysql://")
+
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 
 # Desabilitar o tracking de modificações, recomendado no Flask
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -28,30 +33,40 @@ with app.app_context():
 # Rota de login
 @app.route('/login', methods=['POST'])
 def login():
-    dados = request.json
-    usuario = Usuario.query.filter_by(username=dados['username']).first()
+    try:
+        dados = request.json
+        usuario = Usuario.query.filter_by(username=dados['username']).first()
 
-    if usuario and check_password_hash(usuario.password, dados['password']):
-        return jsonify({'success': True, 'message': 'Login bem-sucedido!'})
-    else:
-        return jsonify({'success': False, 'message': 'Credenciais inválidas!'})
+        if usuario and check_password_hash(usuario.password, dados['password']):
+            return jsonify({'success': True, 'message': 'Login bem-sucedido!'})
+        else:
+            return jsonify({'success': False, 'message': 'Credenciais inválidas!'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Erro no login: {str(e)}'})
 
 # Rota de cadastro
 @app.route('/register', methods=['POST'])
 def register():
-    dados = request.json
-    usuario_existente = Usuario.query.filter_by(username=dados['username']).first()
+    try:
+        dados = request.json
+        # Verificar se as senhas coincidem
+        if dados['password'] != dados['confirm_password']:
+            return jsonify({'success': False, 'message': 'As senhas não coincidem!'})
 
-    if usuario_existente:
-        return jsonify({'success': False, 'message': 'Usuário já existe!'})
+        usuario_existente = Usuario.query.filter_by(username=dados['username']).first()
 
-    # Gerar hash da senha com o método correto
-    hashed_password = generate_password_hash(dados['password'], method='pbkdf2:sha256')
-    novo_usuario = Usuario(username=dados['username'], password=hashed_password)
-    db.session.add(novo_usuario)
-    db.session.commit()
+        if usuario_existente:
+            return jsonify({'success': False, 'message': 'Usuário já existe!'})
 
-    return jsonify({'success': True, 'message': 'Cadastro realizado com sucesso!'})
+        # Gerar hash da senha com o método correto
+        hashed_password = generate_password_hash(dados['password'], method='pbkdf2:sha256')
+        novo_usuario = Usuario(username=dados['username'], password=hashed_password)
+        db.session.add(novo_usuario)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Cadastro realizado com sucesso!'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Erro no cadastro: {str(e)}'})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
