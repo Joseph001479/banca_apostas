@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-from waitress import serve  # Importando o Waitress
 
 app = Flask(__name__)
 CORS(app)  # Habilitar comunicação com o frontend
@@ -51,6 +50,5 @@ def register():
 
     return jsonify({'success': True, 'message': 'Cadastro realizado com sucesso!'})
 
-# Iniciar o servidor com Waitress
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=5000)
+    app.run(debug=True, port=5001)
