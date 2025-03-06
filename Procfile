@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -6,8 +7,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 CORS(app)  # Habilitar comunicação com o frontend
 
-# Conectar ao banco de dados MySQL utilizando a URL fornecida
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://p1qexitu5ewqis3n:pqsv3y2uzvdbx68u@nwhazdrp7hdpd4a4.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/go0mmxvr550d0bbl'
+# Pegar a URL de conexão do banco de dados a partir da variável de ambiente
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('JAWSDB_URL', 'mysql+pymysql://p1qexitu5ewqis3n:pqsv3y2uzvdbx68u@nwhazdrp7hdpd4a4.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/go0mmxvr550d0bbl')
+
+# Desabilitar o tracking de modificações, recomendado no Flask
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -52,4 +55,3 @@ def register():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
-
