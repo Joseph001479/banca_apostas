@@ -7,11 +7,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 CORS(app)  # Habilitar comunicação com o frontend
 
-# Pegar a URL de conexão do banco de dados e ajustá-la para o SQLAlchemy
-DATABASE_URL = os.getenv('JAWSDB_URL')
+# Pegar a URL de conexão do banco de dados do Heroku (PostgreSQL)
+DATABASE_URL = os.getenv('DATABASE_URL')
 
-if DATABASE_URL and DATABASE_URL.startswith("mysql://"):
-    DATABASE_URL = DATABASE_URL.replace("mysql://", "mysql+pymysql://")
+# Ajuste a string de conexão para o PostgreSQL
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 
