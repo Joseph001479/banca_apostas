@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
+from waitress import serve  # Importando o Waitress
 
 app = Flask(__name__)
 CORS(app)  # Habilitar comunicação com o frontend
@@ -14,6 +15,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
+# Configuração do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 
 # Desabilitar o tracking de modificações, recomendado no Flask
@@ -69,5 +71,6 @@ def register():
     except Exception as e:
         return jsonify({'success': False, 'message': f'Erro no cadastro: {str(e)}'})
 
+# Usando o Waitress para produção
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    serve(app, host='0.0.0.0', port=5001)  # Rodando o servidor na porta 5001
