@@ -1,13 +1,14 @@
-# Ignorar arquivos tempor√°rios do sistema
-Thumbs.db
-.DS_Store
+# Ignorar pastas e arquivos do sistema
+__pycache__/
+.env
+.vscode/
+.idea/
 *.log
-
-# Ignorar a pasta de ambiente virtual (se houver)
-venv/
-
-# Ignorar a pasta AppData ou outras pastas indesejadas
+*.dat
+*.exe
+.DS_Store
+Thumbs.db
+.gitconfig
+.gnutls/
+.gologin/
 AppData/
-"Ambiente de Impress∆o/" 
-"Ambiente de Rede/" 
-"AppData/" 
