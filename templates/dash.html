@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Banca</title>
+    <!-- Referência direta aos arquivos movidos para a raiz -->
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="dashboard">
+        <header>
+            <div class="header-content">
+                <h1>Gestão de Banca</h1>
+            </div>
+            <div class="header-actions">
+                <button id="logout-btn">Sair</button>
+            </div>
+        </header>
+
+        <main>
+            <section class="stats">
+                <div class="stat-item">
+                    <h2>Saldo Total</h2>
+                    <p>R$ <span id="saldo">0.00</span></p>
+                </div>
+                <div class="stat-item">
+                    <h2>Lucro/Prejuízo</h2>
+                    <p>R$ <span id="lucro">0.00</span></p>
+                </div>
+                <div class="stat-item">
+                    <h2>ROI</h2>
+                    <p><span id="roi">0%</span></p>
+                </div>
+            </section>
+
+            <section class="apostas">
+                <h2>Adicionar Aposta</h2>
+                <div class="aposta-form">
+                    <input type="text" id="nomeTime" placeholder="Nome do Time" class="input-field">
+                    <input type="number" id="valorAposta" placeholder="Valor da Aposta (R$)" class="input-field">
+                    <input type="number" id="odds" placeholder="Odds" class="input-field">
+                    <select id="resultado" class="input-field">
+                        <option value="win">Vitória</option>
+                        <option value="loss">Derrota</option>
+                    </select>
+                    <button onclick="registrarAposta()" class="btn">Registrar Aposta</button>
+                </div>
+            </section>
+
+            <section class="historico">
+                <h2>Histórico de Apostas</h2>
+                <ul id="listaApostas"></ul>
+            </section>
+
+            <!-- Gráfico de evolução do saldo -->
+            <section class="grafico">
+                <h2>Gráfico de Evolução do Saldo</h2>
+                <canvas id="graficoSaldo"></canvas>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
