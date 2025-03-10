@@ -1,25 +1,28 @@
-import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import timedelta
+from dotenv import load_dotenv
+import os
 from waitress import serve  # Importando o Waitress
+
+# Carregar variáveis de ambiente do arquivo .env
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Habilitar comunicação com o frontend
 
-# Pegar a URL de conexão do banco de dados do Heroku (PostgreSQL)
-DATABASE_URL = os.getenv('DATABASE_URL')
+# Configuração de segurança
+app.secret_key = os.getenv('FLASK_SECRET_KEY')  # Usando a chave secreta do .env
+app.permanent_session_lifetime = timedelta(minutes=30)  # Sessão expira após 30 minutos
 
-# Ajuste a string de conexão para o PostgreSQL
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+# Pegar a URL de conexão do banco de dados do Heroku (PostgreSQL) do .env
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 # Configuração do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-
-# Desabilitar o tracking de modificações, recomendado no Flask
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Desabilitar o tracking de modificações
 
 db = SQLAlchemy(app)
 
@@ -34,43 +37,65 @@ with app.app_context():
     db.create_all()
 
 # Rota de login
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    try:
-        dados = request.json
-        usuario = Usuario.query.filter_by(username=dados['username']).first()
+    if request.method == 'POST':
+        try:
+            dados = request.get_json()
+            if not dados or 'username' not in dados or 'password' not in dados:
+                return jsonify({'success': False, 'message': 'Campos obrigatórios ausentes'}), 400
 
-        if usuario and check_password_hash(usuario.password, dados['password']):
-            return jsonify({'success': True, 'message': 'Login bem-sucedido!'})
-        else:
-            return jsonify({'success': False, 'message': 'Credenciais inválidas!'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Erro no login: {str(e)}'})
+            usuario = Usuario.query.filter_by(username=dados['username']).first()
+
+            if usuario and check_password_hash(usuario.password, dados['password']):
+                session.permanent = True  # A sessão será mantida por 30 minutos
+                session['username'] = usuario.username  # Armazenando o nome de usuário na sessão
+                return jsonify({'success': True, 'message': 'Login bem-sucedido!'}), 200  # Resposta de sucesso
+            else:
+                return jsonify({'success': False, 'message': 'Credenciais inválidas!'}), 401
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'Erro no login: {str(e)}'}), 500
+
+    return render_template('index.html')
+
+# Rota do dashboard
+@app.route('/dash.html')
+def dashboard():
+    if 'username' not in session:
+        return redirect(url_for('login'))  # Redireciona para login se não estiver autenticado
+    return render_template('dash.html')
 
 # Rota de cadastro
 @app.route('/register', methods=['POST'])
 def register():
     try:
-        dados = request.json
-        # Verificar se as senhas coincidem
+        dados = request.get_json()
+        if not dados or 'username' not in dados or 'password' not in dados or 'confirm_password' not in dados:
+            return jsonify({'success': False, 'message': 'Por favor, preencha todos os campos!'}), 400
+
         if dados['password'] != dados['confirm_password']:
-            return jsonify({'success': False, 'message': 'As senhas não coincidem!'})
+            return jsonify({'success': False, 'message': 'As senhas não coincidem!'}), 400
 
         usuario_existente = Usuario.query.filter_by(username=dados['username']).first()
-
         if usuario_existente:
-            return jsonify({'success': False, 'message': 'Usuário já existe!'})
+            return jsonify({'success': False, 'message': 'Usuário já existe!'}), 409  # Conflito - Usuário existente
 
-        # Gerar hash da senha com o método correto
+        # Gerar hash da senha
         hashed_password = generate_password_hash(dados['password'], method='pbkdf2:sha256')
         novo_usuario = Usuario(username=dados['username'], password=hashed_password)
         db.session.add(novo_usuario)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'Cadastro realizado com sucesso!'})
+        return jsonify({'success': True, 'message': 'Cadastro realizado com sucesso!'}), 201  # Criado
     except Exception as e:
-        return jsonify({'success': False, 'message': f'Erro no cadastro: {str(e)}'})
+        return jsonify({'success': False, 'message': f'Erro no cadastro: {str(e)}'}), 500
+
+# Rota de logout
+@app.route('/index.html')
+def logout():
+    session.pop('username', None)  # Remove o usuário da sessão
+    return redirect(url_for('login'))  # Redireciona para a página de login
 
 # Usando o Waitress para produção
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=5001)  # Rodando o servidor na porta 5001
+    serve(app, host='0.0.0.0', port=5000)
