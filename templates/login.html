@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -117,6 +117,7 @@
             <span>Não tem uma conta? <a href="javascript:void(0);" class="link" onclick="toggleForm()">Cadastrar-se</a></span>
         </div>
     </div>
+
     <div class="container" id="signupForm" style="display: none;">
         <h1>Cadastro</h1>
         <div class="input-group">
@@ -136,8 +137,9 @@
             <span>Já tem uma conta? <a href="javascript:void(0);" class="link" onclick="toggleForm()">Entrar</a></span>
         </div>
     </div>
+
     <script>
-        function login() {
+        async function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
@@ -146,22 +148,24 @@
                 return;
             }
 
-            fetch('http://127.0.0.1:5000/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
                 alert(data.message);
                 if (data.success) {
-                    window.location.href = 'dash.html';
+                    window.location.href = 'dash.html';  // Redirecionamento para o dashboard após login
                 }
-            })
-            .catch(error => console.error('Erro:', error));
+            } catch (error) {
+                console.error('Erro:', error);
+                alert("Ocorreu um erro ao tentar fazer login.");
+            }
         }
 
-        function register() {
+        async function register() {
             const username = document.getElementById('newUsername').value;
             const password = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
@@ -176,24 +180,29 @@
                 return;
             }
 
-            fetch('http://127.0.0.1:5000/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, confirm_password: confirmPassword })
+                });
+                const data = await response.json();
                 alert(data.message);
                 if (data.success) {
                     toggleForm();
                 }
-            })
-            .catch(error => console.error('Erro:', error));
+            } catch (error) {
+                console.error('Erro:', error);
+                alert("Ocorreu um erro ao tentar realizar o cadastro.");
+            }
         }
 
         function toggleForm() {
-            document.getElementById('loginForm').style.display = document.getElementById('loginForm').style.display === 'none' ? 'block' : 'none';
-            document.getElementById('signupForm').style.display = document.getElementById('signupForm').style.display === 'none' ? 'block' : 'none';
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+
+            loginForm.style.display = (loginForm.style.display === 'none') ? 'block' : 'none';
+            signupForm.style.display = (signupForm.style.display === 'none') ? 'block' : 'none';
         }
     </script>
 </body>
