@@ -39,7 +39,7 @@ with app.app_context():
 # Rota para a URL raiz
 @app.route('/')
 def home():
-    return render_template('login')  # Aqui você renderiza a página de login
+    return render_template('index.html')  # Aqui você renderiza a página de login
 
 # Rota de login
 @app.route('/login', methods=['GET', 'POST'])
