@@ -10,7 +10,7 @@ from waitress import serve  # Importando o Waitress
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')  # Configura a raiz como pasta de templates
 CORS(app)  # Habilitar comunicação com o frontend
 
 # Configuração de segurança
@@ -61,13 +61,13 @@ def login():
         except Exception as e:
             return jsonify({'success': False, 'message': f'Erro no login: {str(e)}'}), 500
 
-    return render_template('index.html')
+    return render_template('index.html')  # Retorna para o login se for GET
 
 # Rota do dashboard
 @app.route('/dash.html')
 def dashboard():
     if 'username' not in session:
-        return redirect(url_for('login'))  # Redireciona para login se não estiver autenticado
+        return redirect(url_for('home'))  # Redireciona para a página de login se não estiver autenticado
     return render_template('dash.html')
 
 # Rota de cadastro
@@ -96,11 +96,12 @@ def register():
         return jsonify({'success': False, 'message': f'Erro no cadastro: {str(e)}'}), 500
 
 # Rota de logout
-@app.route('/index.html')
+@app.route('/logout')
 def logout():
     session.pop('username', None)  # Remove o usuário da sessão
-    return redirect(url_for('index.html'))  # Redireciona para a página de login
+    return redirect(url_for('home'))  # Redireciona para a página de login
 
 # Usando o Waitress para produção
 if __name__ == '__main__':
     serve(app, host='0.0.0.0', port=5000)
+
