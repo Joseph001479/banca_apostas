@@ -10,7 +10,7 @@ from waitress import serve  # Importando o Waitress
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-app = Flask(__name__, template_folder='.')  # Configura a raiz como pasta de templates
+app = Flask(__name__)
 CORS(app)  # Habilitar comunicação com o frontend
 
 # Configuração de segurança
@@ -36,11 +36,6 @@ class Usuario(db.Model):
 with app.app_context():
     db.create_all()
 
-# Rota para a URL raiz
-@app.route('/')
-def home():
-    return render_template('index.html')  # Aqui você renderiza a página de login
-
 # Rota de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -61,13 +56,13 @@ def login():
         except Exception as e:
             return jsonify({'success': False, 'message': f'Erro no login: {str(e)}'}), 500
 
-    return render_template('index.html')  # Retorna para o login se for GET
+    return render_template('index.html')
 
 # Rota do dashboard
 @app.route('/dash.html')
 def dashboard():
     if 'username' not in session:
-        return redirect(url_for('index.html'))  # Redireciona para a página de login se não estiver autenticado
+        return redirect(url_for('login'))  # Redireciona para login se não estiver autenticado
     return render_template('dash.html')
 
 # Rota de cadastro
@@ -96,11 +91,11 @@ def register():
         return jsonify({'success': False, 'message': f'Erro no cadastro: {str(e)}'}), 500
 
 # Rota de logout
-@app.route('/logout')
+@app.route('/index.html')
 def logout():
     session.pop('username', None)  # Remove o usuário da sessão
-    return redirect(url_for('home'))  # Redireciona para a página de login
+    return redirect(url_for('index.html'))  # Redireciona para a página de login
 
 # Usando o Waitress para produção
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=5000) 
+    serve(app, host='0.0.0.0', port=5000)
