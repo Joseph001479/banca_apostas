@@ -14,3 +14,4 @@ SQLAlchemy==1.4.31
 typing-extensions==3.10.0.2
 waitress==2.1.1
 Werkzeug==2.1.2
+gunicorn==21.2.0
