@@ -36,6 +36,11 @@ class Usuario(db.Model):
 with app.app_context():
     db.create_all()
 
+# Rota para a URL raiz
+@app.route('/')
+def home():
+    return render_template('index.html')  # Aqui você renderiza a página de login
+
 # Rota de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
