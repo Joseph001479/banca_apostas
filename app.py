@@ -36,8 +36,13 @@ class Usuario(db.Model):
 with app.app_context():
     db.create_all()
 
+# Rota para a URL raiz
+@app.route('/')
+def home():
+    return render_template('index.html')  # Aqui você renderiza a página de login
+
 # Rota de login
-@app.route('/index.html', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         try:
@@ -62,7 +67,7 @@ def login():
 @app.route('/dash.html')
 def dashboard():
     if 'username' not in session:
-        return redirect(url_for('home'))  # Redireciona para a página de login se não estiver autenticado
+        return redirect(url_for('index.html'))  # Redireciona para a página de login se não estiver autenticado
     return render_template('dash.html')
 
 # Rota de cadastro
