@@ -94,7 +94,7 @@ def register():
 @app.route('/index.html')
 def logout():
     session.pop('username', None)  # Remove o usuário da sessão
-    return redirect(url_for('login'))  # Redireciona para a página de login
+    return redirect(url_for('index.html'))  # Redireciona para a página de login
 
 # Usando o Waitress para produção
 if __name__ == '__main__':

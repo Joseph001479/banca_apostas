@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // Logout
 document.getElementById("logout-btn").addEventListener("click", function () {
     alert("Você saiu da sua conta!");
-    window.location.href = 'login.html'; // Redireciona para a página de login
+    window.location.href = 'index.html'; // Redireciona para a página de login
 });
 
 let saldoTotal = parseFloat(localStorage.getItem("saldo")) || 0;
