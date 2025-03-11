@@ -37,7 +37,7 @@ with app.app_context():
     db.create_all()
 
 # Rota de login
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/index.html', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         try:
