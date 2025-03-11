@@ -36,6 +36,11 @@ class Usuario(db.Model):
 with app.app_context():
     db.create_all()
 
+# Rota para a URL raiz
+@app.route('/')
+def home():
+    return render_template('index.html')  # Aqui você renderiza a página de login
+
 # Rota de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -62,7 +67,7 @@ def login():
 @app.route('/dash.html')
 def dashboard():
     if 'username' not in session:
-        return redirect(url_for('login'))  # Redireciona para a página de login se não estiver autenticado
+        return redirect(url_for('home'))  # Redireciona para a página de login se não estiver autenticado
     return render_template('dash.html')
 
 # Rota de cadastro
@@ -94,8 +99,8 @@ def register():
 @app.route('/logout')
 def logout():
     session.pop('username', None)  # Remove o usuário da sessão
-    return redirect(url_for('login'))  # Redireciona para a página de login
+    return redirect(url_for('home'))  # Redireciona para a página de login
 
 # Usando o Waitress para produção
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=5000)
+    serve(app, host='0.0.0.0', port=5000) 
