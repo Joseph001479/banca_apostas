@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session 
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,15 +10,12 @@ from waitress import serve  # Importando o Waitress
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-app = Flask(__name__, template_folder='./')  # Configurando a raiz como diretório para os templates
+app = Flask(__name__, template_folder='.')  # Configura a raiz como pasta de templates
 CORS(app)  # Habilitar comunicação com o frontend
 
 # Configuração de segurança
 app.secret_key = os.getenv('FLASK_SECRET_KEY')  # Usando a chave secreta do .env
 app.permanent_session_lifetime = timedelta(minutes=30)  # Sessão expira após 30 minutos
-
-# Configurar o domínio para os cookies de sessão
-app.config['SESSION_COOKIE_DOMAIN'] = '.onrender.com'  # Substitua pelo seu domínio real, caso necessário
 
 # Pegar a URL de conexão do banco de dados do Heroku (PostgreSQL) do .env
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -39,10 +36,10 @@ class Usuario(db.Model):
 with app.app_context():
     db.create_all()
 
-# Rota para a URL raiz (Página de login)
+# Rota para a URL raiz
 @app.route('/')
 def home():
-    return render_template('index.html')  # Renderiza a página de login
+    return render_template('index.html')  # Aqui você renderiza a página de login
 
 # Rota de login
 @app.route('/login', methods=['GET', 'POST'])
@@ -58,7 +55,7 @@ def login():
             if usuario and check_password_hash(usuario.password, dados['password']):
                 session.permanent = True  # A sessão será mantida por 30 minutos
                 session['username'] = usuario.username  # Armazenando o nome de usuário na sessão
-                return redirect('dash.html')  # Redireciona para o GitHub Pages
+                return jsonify({'success': True, 'message': 'Login bem-sucedido!'}), 200  # Resposta de sucesso
             else:
                 return jsonify({'success': False, 'message': 'Credenciais inválidas!'}), 401
         except Exception as e:
@@ -71,7 +68,7 @@ def login():
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('home'))  # Redireciona para a página de login se não estiver autenticado
-    return render_template('dash.html')  # Renderiza o dashboard
+    return render_template('dash.html')
 
 # Rota de cadastro
 @app.route('/register', methods=['POST'])
@@ -106,4 +103,4 @@ def logout():
 
 # Usando o Waitress para produção
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=5000)
+    serve(app, host='0.0.0.0', port=5000) 
