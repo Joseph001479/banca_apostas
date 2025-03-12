@@ -10,7 +10,7 @@ from waitress import serve  # Importando o Waitress
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-app = Flask(__name__)  # Usar a estrutura padrão de templates no Flask
+app = Flask(__name__, template_folder='./')  # Configurando a raiz como diretório para os templates
 CORS(app)  # Habilitar comunicação com o frontend
 
 # Configuração de segurança
