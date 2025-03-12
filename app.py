@@ -39,10 +39,10 @@ class Usuario(db.Model):
 with app.app_context():
     db.create_all()
 
-# Rota para a URL raiz
+# Rota para a URL raiz (Página de login)
 @app.route('/')
 def home():
-    return render_template('index.html')  # Aqui você renderiza a página de login
+    return render_template('index.html')  # Renderiza a página de login
 
 # Rota de login
 @app.route('/login', methods=['GET', 'POST'])
@@ -58,7 +58,7 @@ def login():
             if usuario and check_password_hash(usuario.password, dados['password']):
                 session.permanent = True  # A sessão será mantida por 30 minutos
                 session['username'] = usuario.username  # Armazenando o nome de usuário na sessão
-                return jsonify({'success': True, 'message': 'Login bem-sucedido!'}), 200  # Resposta de sucesso
+                return redirect('https://joseph001479.github.io/banca_apostas/dash.html')  # Redireciona para o GitHub Pages
             else:
                 return jsonify({'success': False, 'message': 'Credenciais inválidas!'}), 401
         except Exception as e:
@@ -71,7 +71,7 @@ def login():
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('home'))  # Redireciona para a página de login se não estiver autenticado
-    return render_template('dash.html')
+    return render_template('dash.html')  # Renderiza o dashboard
 
 # Rota de cadastro
 @app.route('/register', methods=['POST'])
