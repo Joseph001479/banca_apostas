@@ -10,12 +10,15 @@ from waitress import serve  # Importando o Waitress
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-app = Flask(__name__, template_folder='.')  # Configura a raiz como pasta de templates
+app = Flask(__name__)  # Usar a estrutura padrão de templates no Flask
 CORS(app)  # Habilitar comunicação com o frontend
 
 # Configuração de segurança
 app.secret_key = os.getenv('FLASK_SECRET_KEY')  # Usando a chave secreta do .env
 app.permanent_session_lifetime = timedelta(minutes=30)  # Sessão expira após 30 minutos
+
+# Configurar o domínio para os cookies de sessão
+app.config['SESSION_COOKIE_DOMAIN'] = '.onrender.com'  # Substitua pelo seu domínio real, caso necessário
 
 # Pegar a URL de conexão do banco de dados do Heroku (PostgreSQL) do .env
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -103,4 +106,4 @@ def logout():
 
 # Usando o Waitress para produção
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=5000) 
+    serve(app, host='0.0.0.0', port=5000)
