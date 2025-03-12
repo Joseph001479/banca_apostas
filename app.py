@@ -58,7 +58,7 @@ def login():
             if usuario and check_password_hash(usuario.password, dados['password']):
                 session.permanent = True  # A sessão será mantida por 30 minutos
                 session['username'] = usuario.username  # Armazenando o nome de usuário na sessão
-                return redirect('https://joseph001479.github.io/banca_apostas/dash.html')  # Redireciona para o GitHub Pages
+                return redirect('dash.html')  # Redireciona para o GitHub Pages
             else:
                 return jsonify({'success': False, 'message': 'Credenciais inválidas!'}), 401
         except Exception as e:
